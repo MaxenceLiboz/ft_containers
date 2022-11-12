@@ -8,14 +8,14 @@
 
 namespace ft{
 	template <class T>
-	class random_access_iterator : public iterator<random_access_iterator_tag, T>
+	class random_access_iterator : public iterator<std::random_access_iterator_tag, T>
 	{
 		public:
-			typedef typename ft::iterator<random_access_iterator_tag, T>::difference_type	difference_type;
-			typedef typename ft::iterator<random_access_iterator_tag, T>::value_type		value_type;
-			typedef typename ft::iterator<random_access_iterator_tag, T>::pointer			pointer;
-			typedef typename ft::iterator<random_access_iterator_tag, T>::reference			reference;
-			typedef typename ft::iterator<random_access_iterator_tag, T>::iterator_category	iterator_category;
+			typedef typename ft::iterator<std::random_access_iterator_tag, T>::difference_type	difference_type;
+			typedef typename ft::iterator<std::random_access_iterator_tag, T>::value_type		value_type;
+			typedef typename ft::iterator<std::random_access_iterator_tag, T>::pointer			pointer;
+			typedef typename ft::iterator<std::random_access_iterator_tag, T>::reference			reference;
+			typedef typename ft::iterator<std::random_access_iterator_tag, T>::iterator_category	iterator_category;
 		
 		private:
 			pointer	_pointer;
@@ -56,10 +56,6 @@ namespace ft{
 			template<class T2>
 			friend bool		operator!=(const random_access_iterator<T> &lhs, const random_access_iterator<T2> &rhs) {return lhs.base() != rhs.base();}
 			random_access_iterator &operator+=(difference_type n){
-				// difference_type m = n;
-				// if (m >= 0) while (m--) ++(this->_pointer);
-				// else while (m++) --(this->_pointer);
-				// return *base(); 
 				_pointer += n;
 				return *this;
 			}
@@ -119,67 +115,11 @@ namespace ft{
 
 		template<class It>
 		typename ft::iterator_traits<It>::difference_type
-			do_distance(It first, It last, ft::input_iterator_tag)
-		{
-			typename ft::iterator_traits<It>::difference_type result = 0;
-			while (first != last) {
-				++first;
-				++result;
-			}
-			return result;
-		}
-
-		template<class It>
-		typename ft::iterator_traits<It>::difference_type
-			do_distance(It first, It last, ft::random_access_iterator_tag)
-		{
-			return last - first;
-		}
-
-		template<class It>
-		typename ft::iterator_traits<It>::difference_type
 		distance(It first, It last)
 		{
 			return do_distance(first, last, typename ft::iterator_traits<It>::iterator_category());
 		}
 		
-		template<class It>
-		void do_advance(It& it, typename ft::iterator_traits<It>::difference_type n,
-						ft::input_iterator_tag)
-		{
-			while (n > 0) {
-				--n;
-				++it;
-			}
-		}
-		
-		template<class It>
-		void do_advance(It& it, typename ft::iterator_traits<It>::difference_type n,
-						ft::bidirectional_iterator_tag)
-		{
-			while (n > 0) {
-				--n;
-				++it;
-			}
-			while (n < 0) {
-				++n;
-				--it;
-			}
-		}
-		
-		template<class It>
-		void do_advance(It& it, typename ft::iterator_traits<It>::difference_type n,
-						ft::random_access_iterator_tag)
-		{
-			it += n;
-		}
-		
-		template<class It, class Distance>
-		void advance(It& it, Distance n)
-		{
-			do_advance(it, typename ft::iterator_traits<It>::difference_type(n),
-			typename ft::iterator_traits<It>::iterator_category());
-		}
 		template <typename T>
 		typename ft::random_access_iterator<T>::difference_type
 		operator-(const ft::random_access_iterator<T> lhs,

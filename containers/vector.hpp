@@ -312,9 +312,21 @@ namespace ft{
 				}
 			}
 			void swap(vector& x){
-				std::swap(_start, x._start);
-				std::swap(_end, x._end);
-				std::swap(_capacity, x._capacity);
+				pointer		tmp_start;
+				pointer		tmp_end;
+				pointer		tmp_capacity;
+
+				tmp_start		=	x._start;
+				tmp_end			=	x._end;
+				tmp_capacity	=	x._capacity;
+
+				x._start	= _start;
+				x._end		= _end;
+				x._capacity	= _capacity;
+
+				_start		= tmp_start;
+				_end		= tmp_end;
+				_capacity	= tmp_capacity;
 			}
 		/* ************************************************************************** */
 		/* ----------------------------- Elements Access ---------------------------- */
@@ -383,14 +395,6 @@ namespace ft{
 			}
 
 			template <class InputIterator>
-			void _assign_range(InputIterator first, InputIterator last, ft::input_iterator_tag)
-			{
-				clear();
-				for (; first != last; ++first)
-					push_back(*first);
-			}
-
-			template <class InputIterator>
 			void _assign_range(InputIterator first, InputIterator last, std::forward_iterator_tag)
 			{
 				size_type n = ft::distance(first, last);
@@ -404,22 +408,8 @@ namespace ft{
 				}
 			}
 
-			template <class InputIterator>
-			void _assign_range(InputIterator first, InputIterator last, ft::forward_iterator_tag)
-			{
-				size_type n = ft::distance(first, last);
-
-				clear();
-				reserve(n);
-				for (; first != last; ++first)
-				{
-					_allocator.construct(_end, *first);
-					_end++;
-				}
-			}
-
-
 	};
+
 	template< class T, class Allocator >
 	void swap( ft::vector<T,Allocator>& lhs, ft::vector<T,Allocator>& rhs ){
 		lhs.swap(rhs);
