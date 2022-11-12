@@ -2,11 +2,11 @@
 #define STACK_HPP
 
 #include <iostream>
-#include <deque>
+#include "vector.hpp"
 
 namespace ft
 {
-	template <class T, class Container = std::deque<T> >
+	template <class T, class Container = ft::vector<T> >
 	class stack
 	{
 		public:
@@ -53,7 +53,7 @@ namespace ft
 				return lhs._container > rhs._container;
 			}
 			friend bool operator>=(const stack<value_type, container_type>& lhs, const stack<value_type, container_type>& rhs){
-				return lhs._container >= rhs._container
+				return lhs._container >= rhs._container;
 			}
 	};
 }
