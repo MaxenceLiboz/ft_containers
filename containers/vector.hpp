@@ -208,7 +208,7 @@ namespace ft{
 				_end = _start;
 			}
 
-			iterator insert(iterator position, const value_type& val)
+			iterator insert(const_iterator position, const value_type& val)
 			{
 				size_type	pos_len = position - begin();
 
@@ -216,58 +216,50 @@ namespace ft{
 				return _start + pos_len;
 			}
 
-			void insert(iterator position, size_type n, const value_type& val){
+			void insert(const_iterator position, size_type n, const value_type& val){
 				size_type	loc = position - begin();
-				vector		tmp(*this);
-
+				vector		tmp;
+				
 				if (size() + n > capacity())
-					reserve(capacity() * 2 >= size() + n ? capacity() * 2 : size() + n);
-				_end += n;
+					tmp.reserve(capacity() * 2 >= size() + n ? capacity() * 2 : size() + n);
+				else
+					tmp.reserve(capacity());
+				tmp._end += n + size();
+				for (size_type i = 0; i < loc; i++)
+					tmp._allocator.construct(tmp._start + i, *(_start + i));
 				for (size_type i = 0; i < n; i++)
-				{
-					if (loc + i >= tmp.size())
-						_allocator.construct(_start + loc + i, val);
-					else
-						*(_start + loc + i) = val;
-				}
-				for (size_type it = loc; it < tmp.size(); it++)
-				{
-					if (it + n >= tmp.size())
-						_allocator.construct(_start + it + n, tmp[it]);
-					else
-						*(_start + it + n) = tmp[it];
-				}
+					tmp._allocator.construct(tmp._start + loc + i, val);
+				for (size_type i = loc; i < size(); i++)
+					tmp._allocator.construct(tmp._start + i + n, *(_start + i));
+				swap(tmp);
 			}
 
 			template <class InputIterator>
-			void insert(iterator position, InputIterator first, InputIterator last, 
+			void insert(const_iterator position, InputIterator first, InputIterator last, 
 					typename ft::enable_if<!ft::is_integral<InputIterator>::value >::type* = 0)
 			{
 				size_type	loc = position - begin();
-				vector		tmp(*this);
+				size_type	n = last - first;
+				vector		tmp;
 
-				_end = _start + loc;
+				std::cout << "size + n: " << size() + n << std::endl;
+				std::cout << "Capacity" << capacity() << std::endl;
+				if (size() + n > capacity())
+					tmp.reserve(capacity() * 2 >= size() + n ? capacity() * 2 : size() + n);
+				else
+					tmp.reserve(capacity());
+				tmp._end += n + size();
+				for (size_type i = 0; i < loc; i++)
+					tmp._allocator.construct(tmp._start + i, *(_start + i));
+				size_type i = 0;
 				for (; first != last; first++)
 				{
-					if (size() < tmp.size())
-					{
-						*_end = *first;
-						_end++;
-					}
-					else
-						push_back(*first);
+					tmp._allocator.construct(tmp._start + loc + i, *first);
+					i++;
 				}
-				for (size_type it = loc; it < tmp.size(); it++)
-				{
-					if (size() < tmp.size())
-					{
-						*_end = tmp[it];
-						_end++;
-					}
-					else
-						push_back(tmp[it]);
-				}
-				
+				for (size_type i = loc; i < size(); i++)
+					tmp._allocator.construct(tmp._start + i + n, *(_start + i));
+				swap(tmp);	
 			}
 
 			iterator erase(iterator position){
