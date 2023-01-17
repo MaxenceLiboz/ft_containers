@@ -1,16 +1,18 @@
 #ifndef VECTOR_HPP
-
 #define VECTOR_HPP
 
 #include <iterator>
 #include <memory>
 #include <iostream>
+#include <limits>
+
 #include "../iterators/random_access_iterator.hpp"
-#include "../iterators/reverse_iterator_vector.hpp"
+#include "../iterators/reverse_random_access_iterator.hpp"
 #include "../includes/enable_if.hpp"
 #include "../includes/equal.hpp"
 #include "../includes/is_integral.hpp"
 #include "../includes/lexicographical_compare.hpp"
+#include "../includes/distance.hpp"
 #include <vector>
 
 namespace ft{
@@ -19,18 +21,18 @@ namespace ft{
 	{
 		public:
 			// Member types
-			typedef 			T 												value_type;
-			typedef 			Allocator 										allocator_type;
-			typedef typename 	allocator_type::size_type 						size_type;
-			typedef typename 	allocator_type::reference 						reference;
-			typedef typename	allocator_type::const_reference					const_reference;
-			typedef typename 	allocator_type::pointer 						pointer;
-			typedef typename 	allocator_type::const_pointer 					const_pointer;
-			typedef typename 	ft::random_access_iterator<value_type> 			iterator;
-			typedef typename 	ft::random_access_iterator<const value_type>	const_iterator;
-			typedef typename 	ft::reverse_iterator<iterator>					reverse_iterator;
-			typedef typename	ft::reverse_iterator<const_iterator> 			const_reverse_iterator;
-			typedef typename 	ft::iterator_traits<iterator>::difference_type	difference_type; 
+			typedef 			T 													value_type;
+			typedef 			Allocator 											allocator_type;
+			typedef typename 	allocator_type::size_type 							size_type;
+			typedef typename 	allocator_type::reference 							reference;
+			typedef typename	allocator_type::const_reference						const_reference;
+			typedef typename 	allocator_type::pointer 							pointer;
+			typedef typename 	allocator_type::const_pointer 						const_pointer;
+			typedef typename 	ft::random_access_iterator<value_type> 				iterator;
+			typedef typename 	ft::random_access_iterator<const value_type>		const_iterator;
+			typedef typename 	ft::reverse_random_access_iterator<iterator>		reverse_iterator;
+			typedef typename	ft::reverse_random_access_iterator<const_iterator> 	const_reverse_iterator;
+			typedef typename 	ft::iterator_traits<iterator>::difference_type		difference_type;
 				
 			//Need to implement iterator
 			/*
@@ -90,7 +92,7 @@ namespace ft{
 			{
 				if (x.capacity() > 0)
 				{
-					reserve(x.capacity());
+					reserve(x.size());
 					assign(x.begin(), x.end());
 				}
 				return *this;
@@ -238,28 +240,9 @@ namespace ft{
 			void insert(const_iterator position, InputIterator first, InputIterator last, 
 					typename ft::enable_if<!ft::is_integral<InputIterator>::value >::type* = 0)
 			{
-				size_type	loc = position - begin();
-				size_type	n = last - first;
-				vector		tmp;
+				typename ft::iterator_traits<InputIterator>::iterator_category	category;
+				this->_insert_range(position, first, last, category);
 
-				std::cout << "size + n: " << size() + n << std::endl;
-				std::cout << "Capacity" << capacity() << std::endl;
-				if (size() + n > capacity())
-					tmp.reserve(capacity() * 2 >= size() + n ? capacity() * 2 : size() + n);
-				else
-					tmp.reserve(capacity());
-				tmp._end += n + size();
-				for (size_type i = 0; i < loc; i++)
-					tmp._allocator.construct(tmp._start + i, *(_start + i));
-				size_type i = 0;
-				for (; first != last; first++)
-				{
-					tmp._allocator.construct(tmp._start + loc + i, *first);
-					i++;
-				}
-				for (size_type i = loc; i < size(); i++)
-					tmp._allocator.construct(tmp._start + i + n, *(_start + i));
-				swap(tmp);	
 			}
 
 			iterator erase(iterator position){
@@ -377,6 +360,39 @@ namespace ft{
 					return false;
 			}
 		private:
+
+			template<class InputIterator>
+			void _insert_range(const_iterator position, InputIterator first, InputIterator last, std::input_iterator_tag)
+			{
+				vector		tmp(first, last);
+				insert(position, tmp.begin(), tmp.end());
+			}
+
+			template<class InputIterator>
+			void _insert_range(const_iterator position, InputIterator first, InputIterator last, std::forward_iterator_tag)
+			{
+				size_type	loc = position - begin();
+				size_type	n = ft::distance(first, last);
+				vector		tmp;
+
+				if (size() + n > capacity())
+					tmp.reserve(capacity() * 2 >= size() + n ? capacity() * 2 : size() + n);
+				else
+					tmp.reserve(capacity());
+				tmp._end += n + size();
+				for (size_type i = 0; i < loc; i++)
+					tmp._allocator.construct(tmp._start + i, *(_start + i));
+				size_type i = 0;
+				for (; first != last; first++)
+				{
+					tmp._allocator.construct(tmp._start + loc + i, *first);
+					i++;
+				}
+				for (size_type i = loc; i < size(); i++)
+					tmp._allocator.construct(tmp._start + i + n, *(_start + i));
+				swap(tmp);	
+
+			}
 
 			template <class InputIterator>
 			void _assign_range(InputIterator first, InputIterator last, std::input_iterator_tag)

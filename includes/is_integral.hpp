@@ -40,6 +40,10 @@ namespace ft {
 	struct is_integral_type<long> : public Iis_integral<true, long>{};
 	template <>
 	struct is_integral_type<long long> : public Iis_integral<true, long long>{};
+    template <>
+    struct is_integral_type<__int128_t> : public Iis_integral<true, __int128_t>{};
+    template <>
+    struct is_integral_type<__uint128_t> : public Iis_integral<true, __uint128_t>{};
 
 	// Extended integer, any signed and unsigned
 	template <>
