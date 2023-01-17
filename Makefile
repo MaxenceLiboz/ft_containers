@@ -22,7 +22,6 @@ INCLUDES	=	${CONTAINERS_DIR}/vector.hpp						\
 				${CONTAINERS_DIR}/map.hpp							\
 																	\
 				${INCLUDES_DIR}/distance.hpp						\
-				${INCLUDES_DIR}/chooseConst.hpp						\
 				${INCLUDES_DIR}/enable_if.hpp						\
 				${INCLUDES_DIR}/equal.hpp							\
 				${INCLUDES_DIR}/is_integral.hpp						\
@@ -47,7 +46,7 @@ RM					=	rm -rf
 NAME 	=	ft_containers
 
 .PHONY: all
-all: $(NAME) run
+all: $(NAME)
 
 .PHONY: $(NAME)
 $(NAME): 
@@ -62,8 +61,8 @@ $(NAME)-std: ${SRCS} ${INCLUDES}
 	@$(CC) -D NAMESPACE=0 ${SRCS} ${HEADPATH} -o $@
 	@echo "$(ERASE)$(GREEN)[CREATED $@]$(END)"
 
-.PHONY: run
-run: $(NAME)
+.PHONY: test
+test: $(NAME)
 	@./$(NAME)-ft
 	@./$(NAME)-std
 	@echo "$(ERASE)$(GREEN)[Launching tests ... ]$(END)"
